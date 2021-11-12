@@ -40,7 +40,7 @@ class RKSOK:
         return data
 
     async def data_handling(self, verb, *args):
-        if not hasattr(self.storage, VERB_TO_FUNCTION.get(verb)) or args[0].isspace():
+        if not hasattr(self.storage, VERB_TO_FUNCTION.get(verb)): # or args[0].isspace():
             raise RequestDoesNotMeetTheStandart
         function = getattr(self.storage, VERB_TO_FUNCTION.get(verb))
         return await function(
@@ -55,6 +55,8 @@ class RKSOK:
 
         data = raw_data.decode(ENCODING)
         command, name_field, information = RKSOK.parce_response(data)
+        if not name_field:
+            return strings.NOTFOUND
         if len(name_field) > 30 :
             return strings.INCORRECT_REQUEST
 
@@ -78,19 +80,20 @@ class RKSOK:
     async def read_message(self, reader):
         message = b""
         while True:
-            data = await reader.read(1024)
-            if not data:
-                break
+            try:
+                data = await asyncio.wait_for(reader.read(1024), timeout=10)
+            except asyncio.exceptions.TimeoutError:
+                raise RequestDoesNotMeetTheStandart
             message += data
-        if not message.endswith(b'\r\n\r\n'):
-            raise RequestDoesNotMeetTheStandart
+            if message.endswith(b'\r\n\r\n'):
+                break
         return message
 
     async def handle_echo(self, reader, writer) -> None:
         try:
-            raw_data = await asyncio.wait_for(self.read_message(reader), timeout=10)
+            raw_data = await self.read_message(reader)
             response = await self.data_manipulations(raw_data)
-        except (asyncio.exceptions.TimeoutError, RequestDoesNotMeetTheStandart) as e:
+        except RequestDoesNotMeetTheStandart as e:
             response = strings.INCORRECT_REQUEST
 
         writer.write(response.encode(ENCODING))
