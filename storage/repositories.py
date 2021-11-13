@@ -55,7 +55,7 @@ class LocalDirectoryStorage(DataStorageInterface):
         file_name = LocalDirectoryStorage.FILE_PATH.format(name)
         if not aiof.os.path.exists(file_name):
             return strings.NOTFOUND
-        async with aiofiles.open(file_name, mode="r") as f:
+        async with aiofiles.open(file_name, mode="r", encoding="utf-8") as f:
             content = await f.read()
         return strings.CORRECT.format(data=content)
 
@@ -68,7 +68,7 @@ class LocalDirectoryStorage(DataStorageInterface):
 
     async def post_data(self, name: str, information: str):
         file_name = LocalDirectoryStorage.FILE_PATH.format(name)
-        async with aiofiles.open(file_name, mode="w") as f:
+        async with aiofiles.open(file_name, mode="w", encoding="utf-8") as f:
             await f.write(information)
             await f.flush()
         return strings.DONE
