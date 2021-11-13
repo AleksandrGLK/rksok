@@ -62,8 +62,6 @@ class RKSOK:
             else:
                 raise RequestDoesNotMeetTheStandart
 
-            if len(name_field) > 30:
-                raise RequestDoesNotMeetTheStandart
             return (command, name_field, information)
         except ValueError:
             raise RequestDoesNotMeetTheStandart
@@ -75,6 +73,8 @@ class RKSOK:
 
         if not name_field or name_field.isspace():
             return strings.NOTFOUND
+        elif len(name_field) > 30:
+            raise RequestDoesNotMeetTheStandart
 
         server_response = await RKSOK.check_message(data)
 
