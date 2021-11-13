@@ -51,24 +51,30 @@ class RKSOK:
 
     @staticmethod
     def parce_response(data: str) -> list:
-        return re.sub(strings.MESSAGE_PATTERN, r"\1|\2|\3", data, count=1).split("|")
+        try:
+            command, name_field, information = re.sub(
+                strings.MESSAGE_PATTERN, r"\1|\2|\3", data, count=1
+            ).split("|")
+
+            for verb in RequestVerb:
+                if command == verb.value:
+                    break
+            else:
+                raise RequestDoesNotMeetTheStandart
+
+            if len(name_field) > 30:
+                raise RequestDoesNotMeetTheStandart
+            return (command, name_field, information)
+        except ValueError:
+            raise RequestDoesNotMeetTheStandart
 
     async def data_manipulations(self, raw_data: bytes) -> str:
 
         data = raw_data.decode(ENCODING)
         command, name_field, information = RKSOK.parce_response(data)
 
-        for verb in RequestVerb:
-            if command == verb.value:
-                break
-        else:
-            raise RequestDoesNotMeetTheStandart
-
         if not name_field:
             return strings.NOTFOUND
-
-        if len(name_field) > 30:
-            return strings.INCORRECT_REQUEST
 
         server_response = await RKSOK.check_message(data)
 
