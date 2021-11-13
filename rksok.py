@@ -104,7 +104,7 @@ class RKSOK:
         writer.close()
 
     async def __call__(self) -> None:
-        server = await asyncio.start_server(self.handle_echo, "127.0.0.1", 8888)
+        server = await asyncio.start_server(self.handle_echo, "127.0.0.1", 7777)
 
         addrs = ", ".join(str(sock.getsockname()) for sock in server.sockets)
         print(f"Serving on {addrs}")
