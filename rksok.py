@@ -57,8 +57,16 @@ class RKSOK:
 
         data = raw_data.decode(ENCODING)
         command, name_field, information = RKSOK.parce_response(data)
+
+        for verb in RequestVerb:
+            if command == verb.value:
+                break
+        else:
+            raise RequestDoesNotMeetTheStandart
+
         if not name_field:
             return strings.NOTFOUND
+
         if len(name_field) > 30:
             return strings.INCORRECT_REQUEST
 
@@ -68,9 +76,6 @@ class RKSOK:
             f"{RegulatoryServerResponseStatus.APPROVED.value} "
         ):
             return server_response
-        for verb in RequestVerb:
-            if command.startswith(verb.value):
-                break
         storage_response = await asyncio.gather(
             self.data_handling(verb, name_field, information),
             return_exceptions=True,
