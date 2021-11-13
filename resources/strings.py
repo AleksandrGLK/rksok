@@ -6,6 +6,6 @@ POSTFIX = "\r\n\r\n"
 MESSAGE_PATTERN = "(.*?)\s(.*?|\s+)(?=\s\w{5}/1.0).*\s(.*)[.\r\n]*"
 
 INCORRECT_REQUEST = f"{ResponseStatus.INCORRECT_REQUEST.value} {PROTOCOL}{POSTFIX}"
-CORRECT = f"{ResponseStatus.OK.value}  {PROTOCOL}\r\n" + "{data}" +f"{POSTFIX}"
+CORRECT = f"{ResponseStatus.OK.value} {PROTOCOL}\r\n" + "{data}" +f"{POSTFIX}"
 DONE = f"{ResponseStatus.OK.value} {PROTOCOL}{POSTFIX}"
 NOTFOUND = f"{ResponseStatus.NOTFOUND.value} {PROTOCOL}{POSTFIX}"

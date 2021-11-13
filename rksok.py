@@ -109,6 +109,7 @@ class RKSOK:
         except RequestDoesNotMeetTheStandart as e:
             response = strings.INCORRECT_REQUEST
 
+
         writer.write(response.encode(ENCODING))
         await writer.drain()
         writer.close()
