@@ -73,7 +73,7 @@ class RKSOK:
         data = raw_data.decode(ENCODING)
         command, name_field, information = RKSOK.parce_response(data)
 
-        if not name_field:
+        if name_field.isspace():
             return strings.NOTFOUND
 
         server_response = await RKSOK.check_message(data)
