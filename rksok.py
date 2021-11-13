@@ -31,16 +31,18 @@ class RKSOK:
         self.storage = LocalDirectoryStorage()
 
     @staticmethod
-    async def check_message(data: bytes) -> bytes:
+    async def check_message(data: bytes) -> str:
         reader, writer = await asyncio.open_connection("vragi-vezde.to.digital", 51624)
         message = strings.PREFIX + data
         writer.write(message.encode(ENCODING))
         data = await reader.read(1024)
         writer.close()
-        return data
+        return data.decode(ENCODING)
 
     async def data_handling(self, verb, *args):
-        if not hasattr(self.storage, VERB_TO_FUNCTION.get(verb)): # or args[0].isspace():
+        if not hasattr(
+            self.storage, VERB_TO_FUNCTION.get(verb)
+        ):  # or args[0].isspace():
             raise RequestDoesNotMeetTheStandart
         function = getattr(self.storage, VERB_TO_FUNCTION.get(verb))
         return await function(
@@ -57,25 +59,26 @@ class RKSOK:
         command, name_field, information = RKSOK.parce_response(data)
         if not name_field:
             return strings.NOTFOUND
-        if len(name_field) > 30 :
+        if len(name_field) > 30:
             return strings.INCORRECT_REQUEST
 
         server_response = await RKSOK.check_message(data)
 
-        if server_response.decode(ENCODING).startswith(
+        if not server_response.startswith(
             f"{RegulatoryServerResponseStatus.APPROVED.value} "
         ):
-            for verb in RequestVerb:
-                if command.startswith(verb.value):
-                    break
-            storage_response = await asyncio.gather(
-                self.data_handling(verb, name_field, information),
-                return_exceptions=True,
-            )
-            response = storage_response[0]
-            if isinstance(response, Exception):
-                response = strings.INCORRECT_REQUEST
-            return response
+            return server_response
+        for verb in RequestVerb:
+            if command.startswith(verb.value):
+                break
+        storage_response = await asyncio.gather(
+            self.data_handling(verb, name_field, information),
+            return_exceptions=True,
+        )
+        response = storage_response[0]
+        if isinstance(response, Exception):
+            response = strings.INCORRECT_REQUEST
+        return response
 
     async def read_message(self, reader):
         message = b""
@@ -85,7 +88,7 @@ class RKSOK:
             except asyncio.exceptions.TimeoutError:
                 raise RequestDoesNotMeetTheStandart
             message += data
-            if message.endswith(b'\r\n\r\n'):
+            if message.endswith(b"\r\n\r\n"):
                 break
         return message
 
