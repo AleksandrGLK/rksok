@@ -61,15 +61,14 @@ class RKSOK:
                     break
             else:
                 raise RequestDoesNotMeetTheStandart
-
-            return (command, name_field, information)
+            return (command, name_field, information, verb)
         except ValueError:
             raise RequestDoesNotMeetTheStandart
 
     async def data_manipulations(self, raw_data: bytes) -> str:
 
         data = raw_data.decode(ENCODING)
-        command, name_field, information = RKSOK.parce_response(data)
+        command, name_field, information, verb = RKSOK.parce_response(data)
 
         if not name_field or name_field.isspace():
             return strings.NOTFOUND
