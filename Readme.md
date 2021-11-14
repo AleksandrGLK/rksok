@@ -14,5 +14,14 @@
 ## Запуск 
 
 ```
+python3 -m venv vrksok
+source vrksok/bin/activate
+```
+
+```
+pip install -r requirements_rksok.txt
+```
+
+```
 python3 rksok.py
 ```
