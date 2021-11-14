@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class RequestVerb(Enum):
     """Verbs specified in RKSOK specs for requests"""
 
@@ -17,5 +18,15 @@ class ResponseStatus(Enum):
 
 
 class RegulatoryServerResponseStatus(Enum):
+    """Response statuses from the check server."""
+
     APPROVED = "МОЖНА"
     NOT_APPROVED = "НИЛЬЗЯ"
+
+
+
+VERB_TO_FUNCTION = {
+    RequestVerb.GET: "get_data",
+    RequestVerb.WRITE: "post_data",
+    RequestVerb.DELETE: "delete_data",
+}
