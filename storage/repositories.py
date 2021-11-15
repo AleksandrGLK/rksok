@@ -1,7 +1,9 @@
 from typing import NamedTuple
 from abc import ABC, abstractmethod
+import sqlite3
 import aiofiles.os as aiof
 import aiofiles
+import aiosqlite
 import os
 from resources import strings
 
@@ -22,24 +24,55 @@ class DataStorageInterface(ABC):
         pass
 
 
-class SQliteStorage(DataStorageInterface):
+class SQliteStorage(DataStorageInterface):  # , aobject):
     """SQlite storage."""
 
     def __init__(self):
-        pass
+        self.phonebook_db = "rksok.db"
+        self.create()
+
+    def create(self):
+        with sqlite3.connect(self.phonebook_db) as db:
+            db.execute(f"create table if not exists phonebook (name text, phone text)")
+            db.commit()
 
     async def get_data(self, message: NamedTuple):
-        print("Получить данные человека по имени:", message.name_field)
-        return strings.DONE
+        try:
+            async with aiosqlite.connect(self.phonebook_db) as db:
+                async with db.execute(
+                    "select phone from phonebook where name = '%s'", message.name_field
+                ) as cursor:
+                    data = await cursor.fetchone()
+            return strings.CORRECT.format(data=content)
+        except Exception as e:
+            return strings.NOTFOUND
 
     async def delete_data(self, message: NamedTuple):
-        print("Удалить данные человека по имени:", message.name_field)
-        return strings.DONE
+        try:
+            async with aiosqlite.connect(self.phonebook_db) as db:
+                await db.execute(
+                    "delete from phonebook where name = '%s'",{message.name_field}
+                )
+            return strings.DONE
+        except Exception as e:
+            print(e)
+            return strings.NOTFOUND
 
     async def post_data(self, message: NamedTuple):
-        print(f"Изменить данные человека по имени: {message.name_field}")
-        print(f"Изменить {message.information}")
-        return strings.DONE
+        try:
+            async with aiosqlite.connect(self.phonebook_db) as db:
+                await db.execute(
+                    f"insert or ignore into phonebook values (?,?)",
+                    [message.name_field, message.information],
+                )
+                await db.execute(
+                    f"update phonebook set phone = '{message.information}' where name = '{message.name_field}'"
+                )
+                await db.commit()
+            return strings.DONE
+        except Exception as e:
+            print(e)
+            return strings.NOTFOUND
 
 
 class LocalDirectoryStorage(DataStorageInterface):

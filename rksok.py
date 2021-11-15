@@ -152,5 +152,5 @@ class RKSOK:
 
 
 if __name__ == "__main__":
-    rksok = RKSOK("local_files")
+    rksok = RKSOK("sqlite")
     asyncio.run(rksok(), debug=True)
