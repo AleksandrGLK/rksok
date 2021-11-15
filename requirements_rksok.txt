@@ -1,7 +1,7 @@
 aiofiles==0.7.0
 aiohttp==3.7.4.post0
 aiohttp-jinja2==1.4.2
--e git+https://github.com/aio-libs/aiohttp-demos.git@0d9898eec7e262ed0083159613de5d1ea1e98974#egg=aiohttpdemo_chat&subdirectory=demos/chat
+aiosqlite==0.17.0
 allure-python-commons==2.9.43
 asgiref==3.4.1
 astroid==2.8.4
