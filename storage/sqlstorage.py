@@ -49,11 +49,16 @@ class SQLStorage(DataStorageInterface):  # , aobject):
     @not_found_handler
     async def delete_data(self, message: NamedTuple):
         async with databases.Database(self.DATABASE_URL) as db:
-            await db.execute(
-                "delete from phonebook where name = :name",
+            content = await db.fetch_one(
+                "select phone from phonebook where name = :name",
                 values={"name": message.name_field},
             )
-            return strings.DONE
+            if content[0]:
+                await db.execute(
+                    "delete from phonebook where name = :name",
+                    values={"name": message.name_field},
+                )
+                return strings.DONE
 
     @not_found_handler
     async def post_data(self, message: NamedTuple):
