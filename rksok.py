@@ -153,8 +153,6 @@ class RKSOK:
 
 if __name__ == "__main__":
 
-    storage_interface = config.STORAGE_FACTORY.get(
-        input("Type storage type [local_files/sql]"), "local_files"
-    )
+    storage_interface = config.STORAGE_FACTORY.get(*sys.argv[1:], "local_files")
     rksok = RKSOK(storage_interface)
     asyncio.run(rksok(), debug=True)
