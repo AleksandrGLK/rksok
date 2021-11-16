@@ -40,18 +40,20 @@ class SQliteStorage(DataStorageInterface):  # , aobject):
         try:
             async with aiosqlite.connect(self.phonebook_db) as db:
                 async with db.execute(
-                    "select phone from phonebook where name = '%s'", message.name_field
+                    "select phone from phonebook where name = (?)",
+                    (message.name_field,),
                 ) as cursor:
-                    data = await cursor.fetchone()
-            return strings.CORRECT.format(data=content)
+                    content = await cursor.fetchone()
+            return strings.CORRECT.format(data=content[0])
         except Exception as e:
+            print(e)
             return strings.NOTFOUND
 
     async def delete_data(self, message: NamedTuple):
         try:
             async with aiosqlite.connect(self.phonebook_db) as db:
                 await db.execute(
-                    "delete from phonebook where name = '%s'",{message.name_field}
+                    "delete from phonebook where name = (?)", (message.name_field,)
                 )
             return strings.DONE
         except Exception as e:
