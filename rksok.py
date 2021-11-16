@@ -10,7 +10,7 @@ from typing import NamedTuple
 from resources import strings
 from core import config
 from core.logging import logger
-from storage.repositories import STORAGE_FACTORY
+from storage.repositories import DataStorageInterface
 from errors.validation_error import RequestDoesNotMeetTheStandart, EmptyNameField
 from resources.conditions import (
     RequestVerb,
@@ -25,8 +25,8 @@ Message = namedtuple("Message", "command name_field information verb")
 class RKSOK:
     """RKSOK server. More than yellow pages."""
 
-    def __init__(self, storage):
-        self.storage = STORAGE_FACTORY[storage]
+    def __init__(self, storage: DataStorageInterface):
+        self.storage = storage
 
     @staticmethod
     async def check_message(data: bytes) -> str:
@@ -152,5 +152,9 @@ class RKSOK:
 
 
 if __name__ == "__main__":
-    rksok = RKSOK("sqlite")
+
+    storage_interface = config.STORAGE_FACTORY.get(
+        input("Type storage type [local_files/sql]"), "local_files"
+    )
+    rksok = RKSOK(storage_interface)
     asyncio.run(rksok(), debug=True)
