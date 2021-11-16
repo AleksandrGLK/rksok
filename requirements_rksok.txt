@@ -1,4 +1,6 @@
 aiofiles==0.7.0
+aiosqlite==0.17.0
 databases==0.5.3
 greenlet==1.1.2
 SQLAlchemy==1.4.27
+typing_extensions==4.0.0
