@@ -13,15 +13,15 @@
 
 ## Запуск 
 
-```
+```bash
 python3 -m venv vrksok
 source vrksok/bin/activate
 ```
 
-```
+```bash
 pip install -r requirements_rksok.txt
 ```
 
-```
+```bash
 python3 rksok.py [sql/local_files] #local_files -> default value
 ```
