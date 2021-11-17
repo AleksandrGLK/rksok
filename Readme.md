@@ -23,5 +23,5 @@ pip install -r requirements_rksok.txt
 ```
 
 ```
-python3 rksok.py
+python3 rksok.py [sql/local_files] #local_files -> default value
 ```
